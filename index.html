@@ -5,135 +5,282 @@
   <title>SUPPLIER CONTROL - PT. BONECOM TRICOM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- External Libraries -->
+  <script async src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script async src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
+
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 <body>
+  <!-- Hamburger Menu Button -->
+  <button id="hamburger-btn" class="hamburger-btn">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Sidebar Navigation -->
+  <nav id="sidebar-nav" class="sidebar-nav">
+    <div class="sidebar-header">
+      <h2>Menu</h2>
+      <button id="close-sidebar-btn" class="close-sidebar-btn">✕</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#" id="home-link" class="menu-link">🏠 Home</a></li>
+      <li><a href="#" id="admin-link" class="menu-link">👨‍💼 Lihat Data (Admin)</a></li>
+    </ul>
+  </nav>
+
+  <!-- Overlay untuk sidebar -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Admin Password Modal -->
+  <div id="password-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>🔐 Akses Admin</h2>
+      <p>Masukkan kata sandi untuk mengakses data</p>
+      <input type="password" id="password-input" placeholder="Masukkan kata sandi" class="password-input">
+      <div class="modal-buttons">
+        <button id="password-submit-btn" class="btn-submit">Masuk</button>
+        <button id="password-cancel-btn" class="btn-cancel">Batal</button>
+      </div>
+      <div id="password-error" class="password-error" style="display: none;">
+        ❌ Kata sandi salah
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Data View Page -->
+  <div id="admin-page" class="admin-page" style="display: none;">
+    <div class="admin-header">
+      <button id="back-to-home-btn" class="btn-back">← Kembali</button>
+      <h1>📊 Data Supplier</h1>
+      <button id="logout-admin-btn" class="btn-logout">Logout</button>
+    </div>
+
+    <!-- Year & Month Filter -->
+    <div class="admin-filters">
+      <div class="filter-group">
+        <label>Tahun:</label>
+        <select id="year-filter">
+          <option value="">Pilih Tahun</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Bulan:</label>
+        <select id="month-filter">
+          <option value="">Pilih Bulan</option>
+          <option value="1">Januari</option>
+          <option value="2">Februari</option>
+          <option value="3">Maret</option>
+          <option value="4">April</option>
+          <option value="5">Mei</option>
+          <option value="6">Juni</option>
+          <option value="7">Juli</option>
+          <option value="8">Agustus</option>
+          <option value="9">September</option>
+          <option value="10">Oktober</option>
+          <option value="11">November</option>
+          <option value="12">Desember</option>
+        </select>
+      </div>
+      <button id="filter-btn" class="btn-filter">Tampilkan</button>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="statistics-section">
+      <h2>📈 Statistik Bulan Ini</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Kunjungan</div>
+          <div class="stat-value" id="total-visits">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Tepat Waktu</div>
+          <div class="stat-value" id="on-time-count">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Terlambat (Toleransi)</div>
+          <div class="stat-value" id="late-tolerance-count">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Delay</div>
+          <div class="stat-value" id="delay-count">0</div>
+        </div>
+      </div>
+
+      <!-- Top Suppliers Chart -->
+      <div class="top-suppliers">
+        <h3>🏆 Supplier Tepat Waktu Terbanyak</h3>
+        <div id="top-suppliers-list" class="suppliers-list"></div>
+      </div>
+    </div>
+
+    <!-- Data Table Section -->
+    <div class="data-section">
+      <h2>📋 Data Detail</h2>
+      <div id="data-table-container" class="data-table-container">
+        <table id="data-table" class="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Supplier</th>
+              <th>Tanggal</th>
+              <th>Waktu Verifikasi</th>
+              <th>Status</th>
+              <th>Selfie</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="data-tbody">
+            <tr><td colspan="7" style="text-align: center; color: #999;">Tidak ada data</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="image-modal" style="display: none;">
+      <div class="image-modal-content">
+        <button id="close-image-modal-btn" class="close-image-modal">✕</button>
+        <img id="modal-image" src="" alt="Selfie" class="modal-image">
+      </div>
+    </div>
+  </div>
+
   <div class="header">
     <img src="assets/header.png" alt="Header PT Bonecom" class="header-img" />
   </div>
 
   <main class="form-section">
-    <form id="supplier-form" class="form-card">
-      <h2>Form Kunjungan Supplier</h2>
+    <div class="form-container">
+      <!-- Unified Section: Camera + Form -->
+      <div class="unified-section">
+        
+        <!-- Left: Camera Section -->
+        <div class="camera-section">
+          <h3>Verifikasi Wajah</h3>
+          <div class="camera-container">
+            <video id="camera-feed" autoplay playsinline muted></video>
+            <canvas id="face-canvas" style="display: none;"></canvas>
+            <div id="face-overlay" class="face-overlay"></div>
+            <div id="face-status" class="face-status">Arahkan wajah ke kamera</div>
+          </div>
+          <div class="camera-info">
+            <div class="info-item">
+              <span class="label">Wajah Terdeteksi:</span>
+              <span id="face-detected" class="value">❌ Tidak</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Waktu Selfie:</span>
+              <span id="selfie-time" class="value">--:--:--</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Durasi:</span>
+              <span id="selfie-duration" class="value">0 detik</span>
+            </div>
+          </div>
+          <div class="camera-controls">
+            <button type="button" id="start-camera-btn" class="btn-camera btn-primary">Mulai Kamera</button>
+            <button type="button" id="capture-selfie-btn" class="btn-camera btn-secondary" disabled>Ambil Selfie</button>
+            <button type="button" id="stop-camera-btn" class="btn-camera btn-danger" disabled>Hentikan Kamera</button>
+          </div>
+          <div id="selfie-preview" class="selfie-preview" style="display: none;">
+            <img id="captured-selfie" src="" alt="Selfie Anda">
+            <div class="preview-actions">
+              <button type="button" id="use-selfie-btn" class="btn-use-selfie">✅ Gunakan</button>
+              <button type="button" id="retake-selfie-btn" class="btn-retake-selfie">🔄 Ambil Ulang</button>
+            </div>
+          </div>
+        </div>
 
-      <label>Nama Supplier</label>
-      <select name="SUPPLIER" required id="supplier-select">
-        <option value="" disabled selected>-- Pilih Supplier --</option>
-        <option>PT. TENMA INDONESIA (RIT 1)</option>
-        <option>PT. INDAH VARIA EKA SELARAS</option>
-        <option>PT. SIGMA INTI PRESISI</option>
-        <option>PT. HERCULON</option>
-        <option>PT. SINAR SUMINOE (RIT 1)</option>
-        <option>PT. BTI PLANT 5</option>
-        <option>PT. ATHEJA KAWASIMA</option>
-        <option>PT. PRIMARAYA GRAHA</option>
-        <option>PT. RAJAWALI MITRA PRATAMA</option>
-        <option>PT. ENDOTA SINAR INDONESIA</option>
-        <option>PT. TOYO QUALITY ONE INDONESIA</option>
-        <option>PT. RAVALIA INTI MANDIRI</option>
-        <option>PT. SEIREN INDONESIA</option>
-        <option>PT. ARMSTRONG INDONESIA</option>
-        <option>PT. NISSHO INDUSTRI INDONESIA</option>
-        <option>PT. FUJISEAT INDONESIA</option>
-        <option>PT. YKK ZIPPER INDONESIA</option>
-        <option>PT. MEIWA INDONESIA</option>
-        <option>PT. SERVO FIRE INDONESIA</option>
-        <option>PT. INOAC POLYTECHNO (RIT 1)</option>
-        <option>PT. INOAC POLYTECHNO (RIT 2)</option>
-        <option>PT. BONECOM TRICOM (TEGAL)</option>
-        <option>PT. TENMA INDONESIA (RIT 2)</option>
-        <option>PT. SINAR SUMINOE (RIT 2)</option>
-      </select>
+        <!-- Right: Form Section -->
+        <form id="supplier-form" class="form-card">
+          <h2>Data Kunjungan</h2>
 
-      <label>Tanggal</label>
-      <input type="date" name="TANGGAL" required>
+          <!-- Selfie Status Indicator -->
+          <div id="selfie-status-box" class="status-box" style="display: none;">
+            <div class="status-indicator">✅ Selfie Terverifikasi</div>
+          </div>
 
-      <label>Waktu IN</label>
-      <input type="time" name="WAKTU_IN" required>
+          <label for="supplier-select">Nama Supplier <span class="required">*</span></label>
+          <select name="SUPPLIER" required id="supplier-select">
+            <option value="" disabled selected>-- Pilih Supplier --</option>
+            <option>PT. TENMA INDONESIA</option>
+            <option>PT. INOAC POLYTECHNO</option>
+            <option>PT. SIGMA INTI PRESISI</option>
+            <option>PT. ATHEJA AUNDE BHOSOKU</option>
+            <option>PT. YKK ZIPPER INDONESIA</option>
+            <option>PT. SEIREN INDONESIA</option>
+            <option>PT. SINAR SUMINEO</option>
+            <option>PT. NISSO INDUSTRI INDONESIA</option>
+            <option>PT. ENDOTA SINAR INDONESIA</option>
+            <option>PT. PRIMARAYA GRAHA NUSANTARA</option>
+            <option>PT. YOYO QUALITY ONE</option>
+            <option>PT. ARMSTRONG INDONESIA</option>
+            <option>PT. MEIWA</option>
+            <option>PT. BONECOM TRICOM</option>
+            <option>PT. RAJAWALI MITRA PRATAMA</option>
+            <option>PT. MEIHOKU</option>
+            <option>PT. RAVALIA INTI MANDIRI 01</option>
+            <option>PT. RAVALIA INTI MANDIRI 02</option>
+            <option>PT. SERVO INDONESIA</option>
+            <option>PT. INDAH VARIA EKA SELARAS</option>
+            <option>PT. FUJISEAT INDONESIA</option>
+            <option>PT. BONECOM TRICOM TEGAL</option>
+          </select>
 
-      <label>Waktu OUT</label>
-      <input type="time" name="WAKTU_OUT" required>
+          <label>Tanggal Kunjungan</label>
+          <div class="date-row">
+            <div class="date-field">
+              <label style="font-size: 0.85rem; margin-top: 0;">Hari</label>
+              <input type="number" id="day-input" min="1" max="31" readonly style="background: #e8e8e8; cursor: not-allowed;">
+            </div>
+            <div class="date-field">
+              <label style="font-size: 0.85rem; margin-top: 0;">Bulan</label>
+              <input type="number" id="month-input" min="1" max="12" readonly style="background: #e8e8e8; cursor: not-allowed;">
+            </div>
+            <div class="date-field">
+              <label style="font-size: 0.85rem; margin-top: 0;">Tahun</label>
+              <input type="number" id="year-input" readonly style="background: #e8e8e8; cursor: not-allowed;">
+            </div>
+          </div>
 
-      <label>Remark</label>
-      <input type="text" name="REMARK" placeholder="Keterangan jika ada">
+          <!-- Waktu Verifikasi Display -->
+          <label>Waktu Verifikasi</label>
+          <input type="text" id="verification-display" readonly style="background: #e8e8e8; cursor: not-allowed;">
 
-      <button type="submit">Kirim Data</button>
-    </form>
+          <!-- Hidden fields -->
+          <input type="hidden" id="actual-datetime" name="ACTUAL_DATETIME" value="">
+          <input type="hidden" id="verification-time" name="VERIFICATION_TIME" value="">
+          <input type="hidden" id="arrival-status" name="ARRIVAL_STATUS" value="">
+          <input type="hidden" name="TANGGAL" id="tanggal-hidden" value="">
+          <input type="hidden" id="selfie-data" name="SELFIE_DATA" value="">
+
+          <button type="submit" id="submit-btn" disabled>📤 Kirim Data</button>
+          <div class="submit-hint">*Harus selfie terlebih dahulu dan pilih supplier</div>
+        </form>
+      </div>
+
+    </div>
   </main>
 
-  <script>
-    const waktuReferensi = {
-      "PT. TENMA INDONESIA (RIT 1)": "08:00",
-      "PT. INDAH VARIA EKA SELARAS": "08:00",
-      "PT. SIGMA INTI PRESISI": "08:30",
-      "PT. HERCULON": "09:05",
-      "PT. SINAR SUMINOE (RIT 1)": "09:40",
-      "PT. BTI PLANT 5": "10:00",
-      "PT. ATHEJA KAWASIMA": "08:00",
-      "PT. PRIMARAYA GRAHA": "10:10",
-      "PT. RAJAWALI MITRA PRATAMA": "11:10",
-      "PT. ENDOTA SINAR INDONESIA": "11:00",
-      "PT. TOYO QUALITY ONE INDONESIA": "10:40",
-      "PT. RAVALIA INTI MANDIRI": "13:00",
-      "PT. SEIREN INDONESIA": "13:40",
-      "PT. ARMSTRONG INDONESIA": "13:00",
-      "PT. NISSHO INDUSTRI INDONESIA": "13:55",
-      "PT. FUJISEAT INDONESIA": "16:00",
-      "PT. YKK ZIPPER INDONESIA": "15:30",
-      "PT. MEIWA INDONESIA": "13:15",
-      "PT. SERVO FIRE INDONESIA": "09:55",
-      "PT. INOAC POLYTECHNO (RIT 1)": "07:30",
-      "PT. INOAC POLYTECHNO (RIT 2)": "15:00",
-      "PT. BONECOM TRICOM (TEGAL)": "10:40",
-      "PT. TENMA INDONESIA (RIT 2)": "21:10",
-      "PT. SINAR SUMINOE (RIT 2)": "22:00"
-    };
-
-    const form = document.getElementById('supplier-form');
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-
-      const data = new FormData(form);
-      const supplier = data.get('SUPPLIER');
-      const waktuInStr = data.get('WAKTU_IN');
-      const waktuOutStr = data.get('WAKTU_OUT');
-      const referensiStr = waktuReferensi[supplier];
-
-      let status = "Tepat Waktu";
-      if (referensiStr && waktuInStr) {
-        const [jamIn, menitIn] = waktuInStr.split(":").map(Number);
-        const [jamRef, menitRef] = referensiStr.split(":").map(Number);
-
-        const waktuInDate = new Date(0, 0, 0, jamIn, menitIn);
-        const referensiDate = new Date(0, 0, 0, jamRef, menitRef);
-
-        const selisihMenit = (waktuInDate - referensiDate) / 60000;
-
-        if (selisihMenit > 15) {
-          status = "Delay";
-        } else if (selisihMenit < -1) {
-          status = "Advance";
-        } else {
-          status = "Tepat Waktu";
-        }
-      }
-
-      data.append('STATUS', status);
-
-      fetch('https://script.google.com/macros/s/AKfycbxuB2fIZV0S0Mp33LAog2mxUDIksnYkqFbJsPE_VIOLUpR3f5-QSm0vp3cv5LXGpWZSNg/exec', {
-        method: 'POST',
-        body: data
-      })
-      .then(res => res.text())
-      .then(response => {
-        alert("✅ Data berhasil dikirim!");
-        form.reset();
-      })
-      .catch(err => {
-        alert("❌ Gagal mengirim data.");
-        console.error(err);
-      });
-    });
-  </script>
+  <!-- Load external JavaScript files -->
+<<<<<<< Updated upstream
+  <script src="js/config.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/form.js"></script>
+=======
+  <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/form.js"></script>
+  <script src="js/admin.js"></script>
+>>>>>>> Stashed changes
 </body>
 </html>

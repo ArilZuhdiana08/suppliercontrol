@@ -1,0 +1,40 @@
+/**
+ * Configuration File
+ * Berisi konfigurasi dan data referensi untuk aplikasi Supplier Control
+ */
+
+// ===== SUPPLIER SCHEDULE REFERENCE =====
+// Format: "HH:MM" atau "HH:MM; HH:MM" untuk multiple schedules
+const WAKTU_REFERENSI = {
+  "PT. TENMA INDONESIA": "08:20; 16:00",
+  "PT. INOAC POLYTECHNO": "08:00",
+  "PT. SIGMA INTI PRESISI": "08:30",
+  "PT. ATHEJA AUNDE BHOSOKU": "08:00",
+  "PT. YKK ZIPPER INDONESIA": "08:00",
+  "PT. SEIREN INDONESIA": "09:40",
+  "PT. SINAR SUMINEO": "09:40; 15:00",
+  "PT. NISSO INDUSTRI INDONESIA": "09:20",
+  "PT. ENDOTA SINAR INDONESIA": "10:00",
+  "PT. PRIMARAYA GRAHA NUSANTARA": "10:10",
+  "PT. YOYO QUALITY ONE": "10:40",
+  "PT. ARMSTRONG INDONESIA": "10:30",
+  "PT. MEIWA": "10:30",
+  "PT. BONECOM TRICOM": "10:00",
+  "PT. RAJAWALI MITRA PRATAMA": "11:10",
+  "PT. MEIHOKU": "13:00",
+  "PT. RAVALIA INTI MANDIRI 01": "14:00",
+  "PT. RAVALIA INTI MANDIRI 02": "14:00",
+  "PT. SERVO INDONESIA": "15:00",
+  "PT. INDAH VARIA EKA SELARAS": "15:30",
+  "PT. FUJISEAT INDONESIA": "16:00",
+  "PT. BONECOM TRICOM TEGAL": "10:00"
+};
+
+// ===== API ENDPOINTS =====
+const GOOGLE_SHEETS_API = "https://script.google.com/macros/s/AKfycbxuB2fIZV0S0Mp33LAog2mxUDIksnYkqFbJsPE_VIOLUpR3f5-QSm0vp3cv5LXGpWZSNg/exec";
+
+// ===== TOLERANSI KETERLAMBATAN (dalam menit) =====
+const TOLERANCE_MINUTES = 10;
+
+// ===== EARLY ARRIVAL CHECK (dalam menit) =====
+const EARLY_ARRIVAL_MINUTES = 30;
