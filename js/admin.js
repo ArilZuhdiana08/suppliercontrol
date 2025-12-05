@@ -85,6 +85,13 @@ function setupAdminEventListeners() {
   imageModal.addEventListener('click', (e) => {
     if (e.target === imageModal) closeImageModal();
   });
+  
+  // Image error handling
+  modalImage.addEventListener('error', () => {
+    modalImage.alt = '❌ Gambar tidak dapat dimuat';
+    modalImage.style.width = '300px';
+    modalImage.style.height = 'auto';
+  });
 }
 
 // ===== SIDEBAR FUNCTIONS =====
@@ -380,7 +387,7 @@ function displayDataTable(data) {
             </span>
           </td>
           <td>
-            <button class="btn-view-image" onclick="viewSelfieImage('${imageData || 'no-image'}')">
+            <button class="btn-view-image" data-image="${index}" onclick="viewSelfieImage(this.getAttribute('data-image'))">
               👁️ Lihat
             </button>
           </td>
@@ -535,7 +542,28 @@ function displayTopSuppliers(data) {
 /**
  * View selfie image in modal
  */
-function viewSelfieImage(imageData) {
+function viewSelfieImage(imageIndex) {
+  const index = parseInt(imageIndex);
+  
+  if (isNaN(index) || !lastDisplayedData[index]) {
+    alert('⚠️ Gambar tidak ditemukan');
+    return;
+  }
+  
+  const entry = lastDisplayedData[index];
+  const imageData = entry.SELFIE_DATA || entry.selfie_image;
+  
+  if (!imageData || imageData === 'no-image') {
+    alert('⚠️ Gambar selfie tidak tersedia untuk entri ini');
+    return;
+  }
+  
+  // Validate if it's a valid data URL
+  if (!imageData.startsWith('data:')) {
+    alert('⚠️ Format gambar tidak valid');
+    return;
+  }
+  
   modalImage.src = imageData;
   imageModal.style.display = 'flex';
 }

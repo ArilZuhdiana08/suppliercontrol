@@ -172,7 +172,8 @@ function captureSelfie() {
   const timeString = captureSelfieTime.toLocaleTimeString('id-ID');
   selfieTime.textContent = timeString;
 
-  const imageData = faceCanvas.toDataURL('image/jpeg');
+  // Use JPEG with 0.7 quality to reduce file size while maintaining visibility
+  const imageData = faceCanvas.toDataURL('image/jpeg', 0.7);
   capturedSelfie.src = imageData;
   selfiePreview.style.display = 'block';
 
