@@ -1,0 +1,27 @@
+# Environment Variables - JANGAN COMMIT
+.env
+.env.local
+.env.*.local
+
+# Node modules (jika pakai Node)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+
+# Logs
+logs/
+*.log
